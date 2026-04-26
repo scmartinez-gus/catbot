@@ -1,0 +1,18 @@
+# Secrets and local state
+.env
+catbot.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+
+# Runtime logs
+logs/*.log
+
+# OS
+.DS_Store
