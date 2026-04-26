@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 from db import is_new, mark_seen, setup_db
 from discord_notify import send_alert
-from scrapers.adoptapet import fetch_adoptapet_listings
+from scrapers.milo import fetch_milo_listings
 from scrapers.sfspca import fetch_sfspca_listings
 
 
@@ -36,9 +36,9 @@ def run() -> None:
     setup_db()
     logger.info("Starting catbot scrape run.")
 
-    adoptapet_listings: list[dict[str, Any]] = fetch_adoptapet_listings()
+    milo_listings: list[dict[str, Any]] = fetch_milo_listings()
     sfspca_listings: list[dict[str, Any]] = fetch_sfspca_listings()
-    all_listings = adoptapet_listings + sfspca_listings
+    all_listings = milo_listings + sfspca_listings
 
     new_count = 0
     new_target = 0

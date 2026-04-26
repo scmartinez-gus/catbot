@@ -16,10 +16,10 @@ def breed_is_target(breed: str) -> bool:
     return any(t.lower() in bl for t in TARGET_BREEDS)
 
 
-# All cats (speciesId=1) near San Francisco — no breed filter; target breeds are flagged in app code.
-ADOPTAPET_SEARCH_URL: str = (
-    "https://www.adoptapet.com/pet-search?speciesId=1&city=San+Francisco&state=CA"
-)
+# Milo Foundation — public cats gallery (ShelterLuv iframe, cats only, Bay Area org).
+MILO_CATS_GALLERY_URL: str = "https://www.milofoundation.org/cats-for-adoption/"
+# Used only if the iframe is not found on the gallery page; must match the site’s org embed.
+MILO_SHELTERLUV_EMBED_FALLBACK: int = 11413
 
 SFSPCA_URL: str = "https://www.sfspca.org/adoptions/cats/"
 
@@ -28,9 +28,9 @@ EMBED_DESCRIPTION_MAX: int = 500
 
 # Embed “author” row: site name links here; small `icon_url` (Discord-friendly HTTPS).
 SOURCE_BRANDING: dict[str, dict[str, str]] = {
-    "Adopt-a-Pet": {
-        "author_url": "https://www.adoptapet.com/",
-        "icon_url": "https://www.adoptapet.com/favicon.ico",
+    "Milo Foundation": {
+        "author_url": "https://www.milofoundation.org/",
+        "icon_url": "https://www.google.com/s2/favicons?domain=milofoundation.org&sz=64",
     },
     "SF SPCA": {
         "author_url": "https://www.sfspca.org/",
