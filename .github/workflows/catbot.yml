@@ -1,0 +1,72 @@
+# Scheduled catbot: scrape → dedupe (SQLite) → Discord.
+#
+# One-time setup (repo on GitHub):
+#   Settings → Secrets and variables → Actions → New repository secret
+#   Name:  DISCORD_WEBHOOK_URL
+#   Value: your full webhook URL (same as in local .env)
+#
+# Free tier: ~2,000 CI minutes/month; this workflow is usually a few min per run.
+# The SQLite file is saved/restored as an artifact so "already seen" listings persist.
+
+name: Catbot
+
+on:
+  # Every 4 hours (UTC). Edit if you want a different schedule.
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:  # "Run workflow" button in the Actions tab
+
+concurrency:
+  group: catbot
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Not in repo; set under Settings → Secrets → Actions
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      # Previous run’s DB (optional; first run or missing artifact starts fresh)
+      - name: Restore catbot database from last run
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: catbot.yml
+          branch: main
+          name: catbot-db
+          path: .
+          if_no_artifact_found: ignore
+          workflow_conclusion: success
+
+      - name: Run catbot
+        run: python main.py
+
+      - name: Upload catbot database for next run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catbot-db
+          path: catbot.db
+          if-no-files-found: warn
+          retention-days: 90
